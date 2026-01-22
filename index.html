@@ -1,0 +1,416 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>e</title>
+
+    <!-- Faster font fetch -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+
+    <!-- Psychotic font buffet -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=EB+Garamond:wght@400;600&family=DM+Serif+Display&family=Playfair+Display:wght@400;700&family=Crimson+Text:wght@400;600&family=Spectral:wght@400;600&family=Vollkorn:wght@400;600&family=Source+Serif+4:wght@400;600&family=Alegreya:wght@400;700&family=Inter:wght@400;700&family=Work+Sans:wght@400;700&family=Montserrat:wght@400;700&family=Rubik:wght@400;700&family=Raleway:wght@400;700&family=Fira+Sans:wght@400;700&family=Space+Grotesk:wght@400;700&family=Unbounded:wght@400;700&family=Oswald:wght@400;700&family=Bebas+Neue&family=IBM+Plex+Mono:wght@400;700&family=JetBrains+Mono:wght@400;700&family=Inconsolata:wght@400;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <style>
+      :root {
+        --bg: #050509;
+        --fg: #f7f7ff;
+        --muted: rgba(247, 247, 255, 0.6);
+      }
+
+      html,
+      body {
+        height: 100%;
+        margin: 0;
+        background: var(--bg);
+        color: var(--fg);
+        overflow: hidden;
+      }
+
+      body {
+        display: grid;
+        place-items: center;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+        text-rendering: geometricPrecision;
+        font-synthesis: none;
+        cursor: crosshair;
+      }
+
+      .wrap {
+        width: min(1300px, 96vw);
+        text-align: center;
+        user-select: none;
+        position: relative;
+      }
+
+      /* Giant e */
+      #e {
+        font-size: clamp(84px, 10vw, 240px);
+        letter-spacing: -0.06em;
+        line-height: 0.85;
+        will-change: transform, opacity, filter, letter-spacing;
+        transform-origin: 50% 50%;
+      }
+
+      /* Subtle HUD */
+      .hud {
+        position: fixed;
+        left: 18px;
+        bottom: 18px;
+        display: grid;
+        gap: 8px;
+        font:
+          12px/1.4 Inter,
+          system-ui,
+          -apple-system,
+          Segoe UI,
+          Roboto,
+          Arial,
+          sans-serif;
+        color: var(--muted);
+        pointer-events: none;
+      }
+
+      .pill {
+        border: 1px solid rgba(247, 247, 255, 0.12);
+        border-radius: 999px;
+        padding: 6px 10px;
+        backdrop-filter: blur(10px);
+        width: max-content;
+        max-width: 70vw;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      /* Add glitch overlay */
+      .scanlines::before {
+        content: '';
+        position: fixed;
+        inset: 0;
+        background: repeating-linear-gradient(
+          to bottom,
+          rgba(255, 255, 255, 0.015) 0px,
+          rgba(255, 255, 255, 0.015) 1px,
+          rgba(0, 0, 0, 0) 2px,
+          rgba(0, 0, 0, 0) 4px
+        );
+        mix-blend-mode: overlay;
+        opacity: 0.55;
+        pointer-events: none;
+      }
+
+      /* Motion sickness mode */
+      @media (prefers-reduced-motion: reduce) {
+        #e {
+          transition: none !important;
+        }
+      }
+    </style>
+  </head>
+
+  <body class="scanlines">
+    <div class="wrap">
+      <div id="e">eeeeeeeeeeeeeeeeeeeeeeee.ee</div>
+    </div>
+
+    <div class="hud">
+      <div class="pill" id="hudCount">e#0</div>
+      <div class="pill" id="hudFont">Loading…</div>
+      <div class="pill" id="hudHz">Hz: ???</div>
+    </div>
+
+    <script>
+      // ============
+      // PSYCHOTIC E STROBE ENGINE
+      // ============
+
+      const el = document.getElementById('e');
+      const hudCount = document.getElementById('hudCount');
+      const hudFont = document.getElementById('hudFont');
+      const hudHz = document.getElementById('hudHz');
+
+      const baseText = 'eeeeeeeeeeeeeeeeeeeeeeee.ee';
+
+      // 24-ish fonts (add more if you want; just include them in the Google Fonts link above)
+      const fonts = [
+        ['EB Garamond', 'serif'],
+        ['DM Serif Display', 'serif'],
+        ['Playfair Display', 'serif'],
+        ['Crimson Text', 'serif'],
+        ['Spectral', 'serif'],
+        ['Vollkorn', 'serif'],
+        ['Source Serif 4', 'serif'],
+        ['Alegreya', 'serif'],
+
+        [
+          'Inter',
+          'system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif',
+        ],
+        [
+          'Work Sans',
+          'system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif',
+        ],
+        [
+          'Montserrat',
+          'system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif',
+        ],
+        [
+          'Rubik',
+          'system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif',
+        ],
+        [
+          'Raleway',
+          'system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif',
+        ],
+        [
+          'Fira Sans',
+          'system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif',
+        ],
+        [
+          'Space Grotesk',
+          'system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif',
+        ],
+        [
+          'Unbounded',
+          'system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif',
+        ],
+        [
+          'Oswald',
+          'system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif',
+        ],
+        [
+          'Bebas Neue',
+          'system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif',
+        ],
+
+        [
+          'IBM Plex Mono',
+          'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace',
+        ],
+        [
+          'JetBrains Mono',
+          'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace',
+        ],
+        [
+          'Inconsolata',
+          'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace',
+        ],
+      ];
+
+      // Weighted randomness: some fonts appear more, like intrusive thoughts.
+      const weightMap = new Map([
+        ['Unbounded', 3],
+        ['Space Grotesk', 3],
+        ['EB Garamond', 2],
+        ['DM Serif Display', 2],
+        ['JetBrains Mono', 2],
+        ['Bebas Neue', 2],
+        ['Inter', 1],
+        ['IBM Plex Mono', 1],
+      ]);
+
+      const weightedFonts = (() => {
+        const bag = [];
+        for (const f of fonts) {
+          const w = weightMap.get(f[0]) ?? 1;
+          for (let i = 0; i < w; i++) bag.push(f);
+        }
+        return bag;
+      })();
+
+      // PRNG (so it feels deterministic-chaotic)
+      function mulberry32(seed) {
+        return function () {
+          let t = (seed += 0x6d2b79f5);
+          t = Math.imul(t ^ (t >>> 15), t | 1);
+          t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+          return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+        };
+      }
+
+      const rng = mulberry32((Date.now() >>> 0) ^ 0xeeeeeeee);
+
+      function rand(min, max) {
+        return min + (max - min) * rng();
+      }
+
+      function pick(arr) {
+        return arr[Math.floor(rng() * arr.length)];
+      }
+
+      function clamp(n, lo, hi) {
+        return Math.max(lo, Math.min(hi, n));
+      }
+
+      function maybe(p) {
+        return rng() < p;
+      }
+
+      // Horrible but beautiful: Unicode variants to make "e" mutate.
+      const eVariants = [
+        'e',
+        'е',
+        '℮',
+        'ｅ',
+        '𝐞',
+        '𝑒',
+        '𝒆',
+        '𝓮',
+        '𝕖',
+        '𝖊',
+        '𝘦',
+        '𝙚',
+        '𝚎',
+        'ᵉ',
+        'ᴇ',
+      ];
+
+      function mutateText() {
+        // Sometimes keep it pure. Sometimes let it slip.
+        if (maybe(0.55)) return baseText;
+
+        const chars = baseText.split('');
+        for (let i = 0; i < chars.length; i++) {
+          if (chars[i] === 'e' && maybe(0.35)) {
+            chars[i] = pick(eVariants);
+          }
+        }
+
+        // occasional punctuation hallucination
+        if (maybe(0.1)) {
+          const pos = Math.floor(rand(0, chars.length));
+          chars.splice(pos, 0, pick(['·', ':', '∴', '⟡', '⧗', '░', '▒', '▓']));
+        }
+
+        return chars.join('');
+      }
+
+      let count = 0;
+      let lastFont = null;
+
+      // Frequency: it strobes between 6Hz and 18Hz (this is... a lot)
+      // You asked psychotic. This is the psychotic.
+      let hz = 12; // start
+      let intervalMs = Math.round(1000 / hz);
+
+      function updateHz() {
+        // jittery tempo changes, like anxious breathing
+        const targetHz = rand(6, 18);
+        // drift, not jump
+        hz = hz * 0.85 + targetHz * 0.15;
+        hz = clamp(hz, 4, 24);
+        intervalMs = Math.round(1000 / hz);
+        hudHz.textContent = `Hz: ${hz.toFixed(2)}`;
+      }
+
+      // Preload fonts to prevent flashing the browser defaults
+      async function warmFonts() {
+        const promises = fonts.map(([name]) => {
+          return document.fonts.load(`64px "${name}"`).catch(() => {});
+        });
+        await Promise.all(promises);
+      }
+
+      function pickFontNoRepeat() {
+        // keep drawing until it differs from lastFont
+        for (let i = 0; i < 8; i++) {
+          const candidate = pick(weightedFonts);
+          if (!lastFont || candidate[0] !== lastFont[0]) return candidate;
+        }
+        return pick(weightedFonts);
+      }
+
+      function psychoticStylePass() {
+        // violent typography micro-perturbations
+        const rot = rand(-8, 8);
+        const skew = rand(-10, 10);
+        const scaleX = rand(0.92, 1.06);
+        const scaleY = rand(0.9, 1.1);
+        const blur = maybe(0.25) ? rand(0, 1.4) : 0;
+
+        // filter flicker (but not color; keep it monochrome like an interrogation room)
+        const contrast = rand(0.95, 1.45);
+        const brightness = rand(0.85, 1.15);
+
+        // letter spacing is the real demon here
+        const ls = rand(-0.1, 0.14);
+
+        el.style.letterSpacing = `${ls}em`;
+        el.style.filter = `blur(${blur}px) contrast(${contrast}) brightness(${brightness})`;
+        el.style.transform = `rotate(${rot}deg) skew(${skew}deg) scale(${scaleX}, ${scaleY}) translateY(${rand(-3, 3)}px)`;
+
+        // opacity stutter
+        el.style.opacity = maybe(0.1) ? '0.35' : '1';
+      }
+
+      function updateTabTitle(fontName) {
+        // Tab title increments each tick. This is unhinged and perfect.
+        // Make it feel like a counter + a chant.
+        const chantLen = 1 + (count % 20);
+        const chant = 'e'.repeat(chantLen);
+        document.title = `${chant} #${count} — ${fontName}`;
+      }
+
+      // Main loop
+      function tick() {
+        count++;
+
+        // font
+        const [font, fallback] = pickFontNoRepeat();
+        lastFont = [font, fallback];
+        el.style.fontFamily = `"${font}", ${fallback}`;
+        hudFont.textContent = `Font: ${font}`;
+
+        // content mutate
+        el.textContent = mutateText();
+
+        // style
+        psychoticStylePass();
+
+        // HUD + tab title
+        hudCount.textContent = `e#${count}`;
+        updateTabTitle(font);
+
+        // tempo occasionally shifts
+        if (count % 12 === 0 || maybe(0.08)) updateHz();
+
+        // reschedule with jitter, not fixed interval
+        const jitter = rand(-0.18, 0.18) * intervalMs;
+        setTimeout(tick, Math.max(16, intervalMs + jitter));
+      }
+
+      (async function init() {
+        el.textContent = baseText;
+        hudFont.textContent = 'Font: warming…';
+        hudHz.textContent = `Hz: ${hz.toFixed(2)}`;
+
+        await warmFonts();
+
+        // start slightly delayed so the first swap feels like an event
+        setTimeout(() => {
+          tick();
+        }, 250);
+      })();
+
+      // Click to toggle "even worse"
+      // (turns on ultra-strobe 24Hz burst for 2 seconds)
+      window.addEventListener('click', () => {
+        const old = hz;
+        hz = 24;
+        intervalMs = Math.round(1000 / hz);
+        hudHz.textContent = `Hz: ${hz.toFixed(2)} (BURST)`;
+        setTimeout(() => {
+          hz = old;
+          intervalMs = Math.round(1000 / hz);
+          hudHz.textContent = `Hz: ${hz.toFixed(2)}`;
+        }, 2000);
+      });
+    </script>
+  </body>
+</html>
